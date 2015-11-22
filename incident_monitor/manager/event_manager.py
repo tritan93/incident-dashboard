@@ -8,24 +8,26 @@ class EventManager(object):
 		self.db_access = DbAccess(db_path)
 
 	def get_all_events(self):
-		cmd = 'select * from incident_views;'
+		cmd = 'select * from incidents_view;'
 		output = self.db_access.execute(cmd)
-		if output:
-			pass
-		else:
-			return self.get_all_events_tmp()
-
-	def get_all_events_tmp(self):
-		events = []
-		events.append(Event('Haze', str(datetime.now()), 1.0456264, 104.0304535, 'Indonesia'))
-		events.append(Event('Fire', str(datetime.now()), 1.406624, 103.740463, 'Singapore'))
-		events.append(Event('Flood', str(datetime.now()), 1.313266, 103.824234, 'Singapore'))
-		return events
+		return self.get_events_from_output(output)
 
 	def get_events_by_country(self, country):
-		cmd = 'select * from incident_views where country =%s;'%(country)
+		cmd = 'select * from incidents_view where country="%s";'%(country.upper())
 		output = self.db_access.execute(cmd)
-		if output:
-			pass
-		else:
-			return self.get_all_events_tmp()
+		return self.get_events_from_output(output)
+
+	def get_events_from_output(self, output):
+		events = []
+		for row in output:
+			events.append(Event(row.get('EVENT_NAME'),
+								row.get('EVENT_DATE'),
+								row.get('LATITUDE'),
+								row.get('LONGITUDE'),
+								row.get('COUNTRY'),
+								row.get('ROUTE_NAME'),
+								row.get('LOCALITY'),
+								row.get('NEIGHBOURHOOD'),
+								row.get('ADMIN_AREA_LEVEL1'),
+								row.get('FORMATTED_ADDRESS')))
+		return events

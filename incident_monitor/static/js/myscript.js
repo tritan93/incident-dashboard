@@ -17,26 +17,27 @@ $(function(){
         }).get();
         $table.find('thead tr').children().each(function(i, v) {
             $(v).width(colWidth[i]);
-        });    
+        });
     }).click();
     
     //Make a table row clickable
     $(".clickable-row").click(function() {
         identifier = $(this).closest("table").attr("id");
         if(identifier == "event-table"){
-            handleEventClick($(this))
+            handleEventClick($(this));
         } else if(identifier == "asset-table"){
-            handleAssetClick($(this))
+            handleAssetClick($(this));
         }
     });
     //Create slider for distance
     $("#slider").slider({
         min: 0,
         max: 100,
-        value: 10,
+        value: 100,
         slide:updateSliderValue,
         change: updateSliderValue
     });
+    updateSliderValue();
     drawMarkers();
 })
 
@@ -65,8 +66,17 @@ function drawMarkers(){
             map: map,
             icon: eventImg
         });
+        var infowindow = new google.maps.InfoWindow({
+            content: name
+        });
         marker.addListener('click', function() {
             console.log('event marker clicked');
+        });
+        marker.addListener('mouseover', function() {
+            infowindow.open(map, this);
+        });
+        marker.addListener('mouseout', function() {
+            infowindow.close();
         });
     });
 
@@ -82,8 +92,17 @@ function drawMarkers(){
             map: map,
             icon: assetImg
         });
+        var infowindow = new google.maps.InfoWindow({
+            content: name
+        });
         marker.addListener('click', function() {
             console.log('asset marker clicked');
+        });
+        marker.addListener('mouseover', function() {
+            infowindow.open(map, this);
+        });
+        marker.addListener('mouseout', function() {
+            infowindow.close();
         });
     });
 }

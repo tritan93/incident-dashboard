@@ -2,16 +2,18 @@ import json
 from incident_monitor.manager.asset_manager import AssetManager
 from incident_monitor.manager.event_manager import EventManager
 from incident_monitor.util.util import distance as get_distance
+from incident_monitor.settings import DB_LOCATION
 
 class Controller(object):
 
     def __init__(self):
-        self.asset_mgr = AssetManager('')
-        self.event_mgr = EventManager('')
+        self.asset_mgr = AssetManager(DB_LOCATION)
+        self.event_mgr = EventManager(DB_LOCATION)
 
     def init_index(self):
         args = {'assets': self.asset_mgr.get_all_assets(),
                 'events': self.event_mgr.get_all_events()}
+        print args
         return args
 
     def retrieve_data(self, request):
@@ -35,6 +37,8 @@ class Controller(object):
                 if distance <= float(distance_filter):
                     assets.append({'asset': asset.__dict__,
                                   'distance': distance})
+        if assets:
+            assets.sort(key=lambda x:x.get('distance'))
         return {'assets':assets, 'events': [], 'response': 'success'}
 
     def retrieve_events_by_asset(self, request):
@@ -50,4 +54,6 @@ class Controller(object):
                 if distance <= float(distance_filter):
                     events.append({'event': event.__dict__,
                                   'distance': distance})
+        if events:
+            events.sort(key=lambda x:x.get('distance'))
         return {'events':events, 'assets': [], 'response': 'success'}

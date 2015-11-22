@@ -7,25 +7,23 @@ class AssetManager(object):
 		self.db_access = DbAccess(db_path)
 
 	def get_all_assets(self):
-		cmd = 'select * from assets;'
+		cmd = 'select * from BANK_ASSET_VIEW;'
 		output = self.db_access.execute(cmd)
-		if output:
-			pass
-		else:
-			return self.get_all_assets_tmp()
-
-	def get_all_assets_tmp(self):
-		assets = []
-		assets.append(Asset('NUS', 1.3049414, 103.7731876, 'Singapore'))
-		assets.append(Asset('HBF', 1.2658069, 103.8189014, 'Singapore'))
-		assets.append(Asset('OUE', 1.283049, 103.852760, 'Singapore'))
-		assets.append(Asset('One Raffles Place', 1.2844948, 103.8511573, 'Singapore'))
-		return assets
+		return self.get_assets_from_output(output)
 
 	def get_assets_by_country(self, country):
-		cmd = 'select * from assets where country =%s;'%(country)
+		cmd = 'select * from BANK_ASSET_VIEW where COUNTRY="%s";'%(country.upper())
 		output = self.db_access.execute(cmd)
-		if output:
-			pass
-		else:
-			return self.get_all_assets_tmp()
+		return self.get_assets_from_output(output)
+
+	def get_assets_from_output(self, output):
+		assets = []
+		for row in output:
+			assets.append(Asset(row.get('DISPLAY_NAME'),
+								row.get('LATITUDE'),
+								row.get('LONGITUDE'),
+								row.get('COUNTRY'),
+								row.get('SITE_TYPE'),
+								row.get('REGION'),
+								row.get('ADDRESS')))
+		return assets

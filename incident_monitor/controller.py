@@ -10,11 +10,15 @@ class Controller(object):
         self.asset_mgr = AssetManager(DB_LOCATION)
         self.event_mgr = EventManager(DB_LOCATION)
 
-    def init_index(self):
-        args = {'assets': self.asset_mgr.get_all_assets(),
-                'events': self.event_mgr.get_all_events()}
-        print args
-        return args
+    def get_events_assets(self, request):
+        date_filter = request.POST.get('dateFilter')
+        region_filter = request.POST.get('regionFilter')
+        print date_filter, region_filter
+        events = []
+        for event in self.event_mgr.get_events_by_date_region(date_filter, region_filter):
+            events.append({'event': event.__dict__})
+        print events
+        return {'assets':[], 'events': events, 'response': 'success'}
 
     def retrieve_data(self, request):
         data_type = request.POST.get('type')

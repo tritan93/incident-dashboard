@@ -13,12 +13,18 @@ def get_controller(request):
 	return ControllerSingleton().get_controller(requesterAddr)
 
 def index(request):
-    arguments = get_controller(request).init_index()
-    return render(request, 'index.html', arguments)
+    return render(request, 'index.html', {})
 
-def handle_ajax(request):
-    if request.method == "POST":
+def handle_post_request(request):
+    if request.method == 'POST':
         response_data = get_controller(request).retrieve_data(request)
-        return HttpResponse(json.dumps(response_data), content_type="application/json")
+        return HttpResponse(json.dumps(response_data), content_type='application/json')
     else:
-        return HttpResponseRedirect("/index/")
+        return HttpResponseRedirect('/index/')
+
+def get_events_assets(request):
+    if request.method == 'POST':
+        response_data = get_controller(request).get_events_assets(request)
+        return HttpResponse(json.dumps(response_data), content_type='application/json')
+    else:
+        return HttpResponseRedirect('/index/')

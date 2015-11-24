@@ -1,5 +1,8 @@
 var map;
-var circles = []
+var circles = [];
+var assets = [];
+var events = [];
+var markers = [];
 
 $(function(){
 	var mapProp = {
@@ -8,7 +11,64 @@ $(function(){
     	mapTypeId:google.maps.MapTypeId.ROADMAP
   	};
   	map=new google.maps.Map(document.getElementById("googleMap"),mapProp);
-    
+    $( "#datepicker" ).datepicker();
+    //Create slider for distance
+    $("#slider").slider({
+        min: 0,
+        max: 100,
+        value: 100,
+        slide:updateSliderValue,
+        change: updateSliderValue
+    });
+    updateSliderValue();
+    $("#filter-event-btn").click(function(){
+        getEventsAssets();
+        drawEventMarkers();
+    });
+})
+
+function getEventsAssets(){
+    dateFilter = $("#datepicker").val();
+    regionFilter = $("#regionpicker").val();
+    console.log(dateFilter + " " + regionFilter);
+    $.ajax({
+        method: "POST",
+        url: '/index/get-events-assets/',
+        type: "text",
+        data: {csrfmiddlewaretoken: $("[name='csrfmiddlewaretoken']")[0].value,
+               dateFilter:dateFilter, regionFilter: regionFilter},
+        success: function(msg){
+            if(msg.response == 'success'){
+                displayEvents(msg.events);
+            }
+        }
+    });
+}
+
+function displayEvents(events){
+    if(events.length){
+        var eventTableBody = $("#event-table tbody");
+        for(var i = 0, len = events.length; i < len; i++){
+            var row = $("<tr></tr>").addClass("clickable-row");
+            row.append("<td>" + events[i].event.name + "</td>");
+            row.append("<td>" + events[i].event.date + "</td>");
+            row.append("<td>"+ events[i].event.country +"</td>");
+            row.append("<td style='display: none;'>"+ events[i].event.lat +"</td>");
+            row.append("<td style='display: none;'>"+ events[i].event.lng +"</td>");
+            eventTableBody.append(row);
+        }
+        $("#event-table").show();
+        $("#slider").show();
+        $("#slider-value").show();
+        assignRowClickEvent();
+    }
+}
+
+function displayAssets(){
+
+}
+
+function assignRowClickEvent(){
     var $table = $('table.scroll'),
     $bodyCells = $table.find('tbody tr:first').children(),colWidth;
     $(window).click(function() {
@@ -19,9 +79,9 @@ $(function(){
             $(v).width(colWidth[i]);
         });
     }).click();
-    
     //Make a table row clickable
     $(".clickable-row").click(function() {
+        console.log($(this));
         identifier = $(this).closest("table").attr("id");
         if(identifier == "event-table"){
             handleEventClick($(this));
@@ -29,24 +89,9 @@ $(function(){
             handleAssetClick($(this));
         }
     });
-    //Create slider for distance
-    $("#slider").slider({
-        min: 0,
-        max: 100,
-        value: 100,
-        slide:updateSliderValue,
-        change: updateSliderValue
-    });
-    updateSliderValue();
-    drawMarkers();
-})
+}
 
-function drawMarkers(){
-    var assetImg = {
-        url: "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|3B5998",
-        size: new google.maps.Size(21, 34),
-        origin: new google.maps.Point(0,0),
-        anchor: new google.maps.Point(10, 34)};
+function drawEventMarkers(){
     var eventImg = {
         url: "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|FE7569",
         size: new google.maps.Size(21, 34),
@@ -66,6 +111,7 @@ function drawMarkers(){
             map: map,
             icon: eventImg
         });
+        markers.push(marker);
         var infowindow = new google.maps.InfoWindow({
             content: name
         });
@@ -79,19 +125,25 @@ function drawMarkers(){
             infowindow.close();
         });
     });
+}
 
-    $("#asset-table tbody tr").each(function(){
-        attrs = $(this).find("td");
-        name = $(attrs[0]).text();
-        country = $(attrs[1]).text();
-        lat = $(attrs[2]).text();
-        lng = $(attrs[3]).text();
+function drawAssetMarkers(assets){
+    var assetImg = {
+        url: "http://chart.apis.google.com/chart?chst=d_map_pin_letter&chld=%E2%80%A2|3B5998",
+        size: new google.maps.Size(21, 34),
+        origin: new google.maps.Point(0,0),
+        anchor: new google.maps.Point(10, 34)};
+    for(var i =0, len = assets.length; i<len; i++){
+        name = assets[i].asset.name;
+        lat = assets[i].asset.lat;
+        lng = assets[i].asset.lng;
         latLng = {lat: parseFloat(lat), lng:parseFloat(lng)};
         var marker = new google.maps.Marker({
             position: latLng,
             map: map,
             icon: assetImg
         });
+        markers.push(marker)
         var infowindow = new google.maps.InfoWindow({
             content: name
         });
@@ -104,7 +156,7 @@ function drawMarkers(){
         marker.addListener('mouseout', function() {
             infowindow.close();
         });
-    });
+    }
 }
 
 function updateSliderValue(){
@@ -152,7 +204,10 @@ function postAjaxRequest(data){
         data: data,
         success: function(msg){
             if(msg.response == 'success'){
-                displayResult(data, msg);                
+                displayResult(data, msg);
+                clearMarkers();
+                drawEventMarkers();
+                drawAssetMarkers(msg.assets);
             }
         }
     });
@@ -207,4 +262,14 @@ function clearCircles(){
     for(var i = 0, len = circles.length; i<len; i++){
         circles[i].setMap(null);
     }
+}
+
+function clearMarkers(){
+    console.log("clearMarkers");
+    console.log(markers);
+    for(var i = 0, len = markers.length; i<len; i++){
+        markers[i].setMap(null);
+    }
+    markers = [];
+    console.log(markers);
 }

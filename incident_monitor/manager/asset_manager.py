@@ -1,5 +1,6 @@
 from incident_monitor.util.db_access import DbAccess
 from incident_monitor.entity.asset import Asset
+from incident_monitor.settings import EMAILS
 
 class AssetManager(object):
 	
@@ -11,10 +12,12 @@ class AssetManager(object):
 		output = self.db_access.execute(cmd)
 		return self.get_assets_from_output(output)
 
-	def get_assets_by_country(self, country):
-		cmd = 'select * from BANK_ASSET_VIEW where COUNTRY="%s";'%(country.upper())
+	def get_assets_by_region(self, region):
+		results = []
+		cmd = 'select * from BANK_ASSET_VIEW where upper(REGION)="%s";'%(region.upper())
 		output = self.db_access.execute(cmd)
-		return self.get_assets_from_output(output)
+		results.extend(self.get_assets_from_output(output))
+		return results
 
 	def get_assets_from_output(self, output):
 		assets = []
@@ -25,5 +28,6 @@ class AssetManager(object):
 								row.get('COUNTRY'),
 								row.get('SITE_TYPE'),
 								row.get('REGION'),
-								row.get('ADDRESS')))
+								row.get('ADDRESS'),
+								EMAILS.get(row.get('REGION'))))
 		return assets

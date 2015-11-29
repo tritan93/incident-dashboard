@@ -3,49 +3,68 @@
 {% block content %}
 {% csrf_token %}
 <div class="container-fluid">
-  	<div class="row">
-  		<div class="col-sm-6"><div id="googleMap" style="width:100%;height:600px;"></div></div>
-  		<div class="col-sm-6">
-            <table  cellspacing="0" cellpadding="0" style="border: none;">
-                <tr>
-                    <td><p><b>Date:</b><input type="text" id="datepicker"></p></td>
-                    <td>
-                        <label for="regionpicker">Region</label>
-                        <select name="region" id="regionpicker">
-                            <option>Slower</option>
-                            <option>Slow</option>
-                            <option selected="selected">APAC</option>
-                            <option>Fast</option>
-                            <option>Faster</option>
-                        </select>
-                    </td>
-                    <td><button id="filter-event-btn" type="button" class="btn btn-default">Filter</button></td>
-                </tr>
-            </table>
-            <br/>
-            <div class="tab-content">
-                <div id="events">
-                    <table id="event-table" class="table-bordered table-hover scroll" style="display:none;">
-                        <thead>
-                            <td>Event Name</td>
-                            <td>Date</td>
-                            <td>Country</td>
-                            <td style="display: none;"></td>
-                            <td style="display: none;"></td>
-                        </thead>
-                    <tbody></tbody>
-                    </table>
-                </div>
-            </div>
-            <br/>
-            <div id="slider-value" style="display:none;">Distance: 0 km</div>
-            <div id="slider" style="display:none;"></div>
-            <br/>
-            <div id="result" style="display:none"></div>
-        </div>
-	</div>
+   <div class="row">
+      <div class="col-sm-6">
+         <div id="googleMap" style="width:100%;height:600px;"></div>
+      </div>
+      <div class="col-sm-6">
+         <table  cellspacing="0" cellpadding="0" style="border: none;">
+            <tr>
+               <td>
+                  <p><b>Date:</b><input type="text" id="datepicker"></p>
+               </td>
+               <td>
+                  <div>
+                     <label for="regionpicker">Region</label>
+                     <select name="region" id="regionpicker">
+                        <option>East</option>
+                        <option>North Central</option>
+                        <option>East</option>
+                        <option>EMEA</option>
+                        <option>APAC - India</option>
+                        <option>APAC - North Asia</option>
+                        <option selected="selected">APAC - SE Asia/Australia</option>
+                     </select>
+                  </div>
+               </td>
+            </tr>
+         </table>
+         <button id="filter-event-btn" type="button" class="btn btn-default">View Events</button>
+         <button id="filter-asset-btn" type="button" class="btn btn-default">View Assets</button>
+         <br/>
+         <br/>
+                  <table id="event-table" class="table-bordered table-hover scroll" style="display:none">
+                     <thead>
+                        <td>Event Name</td>
+                        <td>Date</td>
+                        <td>Country</td>
+                        <td style="display: none;"></td>
+                        <td style="display: none;"></td>
+                     </thead>
+                     <tbody></tbody>
+                  </table>
+                  <table id="asset-table" class="table-bordered table-hover scroll" style="display:none">
+                     <thead>
+                        <td>Asset</td>
+                        <td>Country</td>
+                        <td style="display: none;"></td>
+                        <td style="display: none;"></td>
+                        <td style="display: none;"></td>
+                     </thead>
+                     <tbody></tbody>
+                  </table>
+         <br/>
+         <div id="slider-value" style="display:none;">Distance: 0 km</div>
+         <div id="slider" style="display:none;"></div>
+         <br/>
+         <div id="result" style="display:none"></div>
+         <br/>
+         <button id="asset-email-btn" type="button" class="btn btn-default" style="display:none">Email</button>
+      </div>
+   </div>
 </div>
 <link rel="stylesheet" type="text/css" href="/../static/css/table-style.css">
+<link rel="stylesheet" href="/../static/css/font-awesome.css">
 <script src="http://maps.googleapis.com/maps/api/js?key=AIzaSyAM2GxecuxmLMeUc21w3-QuAD_9d2CQj4k"></script>
 <script type="text/javascript" src="/../static/js/myscript.js"></script>
 

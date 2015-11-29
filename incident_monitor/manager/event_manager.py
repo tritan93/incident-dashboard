@@ -27,7 +27,10 @@ class EventManager(object):
 		return events
 
 	def format_date(self, date):
-		return datetime.strptime(date, '%m/%d/%Y').strftime('%Y-%m-%d')
+		try:
+			return datetime.strptime(date, '%m/%d/%Y').strftime('%Y-%m-%d')
+		except:
+			return date
 
 	def get_events_from_output(self, output):
 		events = []
